@@ -69,6 +69,8 @@ console.log(productManager.getProducts())
 // stock:25
 // El objeto debe agregarse satisfactoriamente con un id generado automáticamente SIN REPETIRSE
 console.log(productManager.addProduct('product test', 'this is a product test', 200, 'no image', 'abc123', 25))
+console.log(productManager.addProduct('product test', 'this is a product test', 200, 'no image', 'abc124', 25))
+console.log(productManager.addProduct('product test', 'this is a product test', 200, 'no image', 'abc125', 25))
 
 // Se llamará el método “getProducts” nuevamente, esta vez debe aparecer el producto recién agregado
 console.log(productManager.getProducts())
@@ -82,4 +84,4 @@ console.log(productManager.getProductById(15))
 
 
 // Se evaluará que addProduct devuelva error si no encuentra algun parametro (parametro vacio sino node retorna error)
-console.log(productManager.addProduct('','this is a product test', 200, 'no image', 'abc125', 25))
+console.log(productManager.addProduct('','this is a product test', 200, 'no image', 'abc126', 25))
