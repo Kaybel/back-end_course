@@ -126,6 +126,15 @@ class ProductManager {
             stock: 25
         }
 
+        const product4 = {
+            title: '',
+            description: 'Este es un producto prueba',
+            price: 200,
+            thumbnail: 'Sin imagen',
+            code: 'abc852',
+            stock: 25
+        }
+
         // Se creará una instancia de la clase “ProductManager”
         const productManager = new ProductManager()
 
@@ -158,6 +167,12 @@ class ProductManager {
         //Se llamará al método “deleteProduct”, se evaluará que realmente se elimine el producto o que arroje un error en caso de no existir.
         console.log(await productManager.deleteProduct(1))
         console.log(await productManager.getProducts())
+
+        //Se llamará al método “addProduct” con los mismos campos de arriba, debe arrojar un error porque el código estará repetido.
+        console.log(await productManager.addProduct(product2))
+
+        // Se evaluará que addProduct devuelva error si no encuentra algun parametro (parametro vacio sino node retorna error)
+        console.log(await productManager.addProduct(product4))
     }
 }
 
