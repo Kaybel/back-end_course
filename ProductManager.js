@@ -10,14 +10,19 @@ class ProductManager {
 
     async addProduct(product) {
         try {
-            if(this.#validateData(product)){
-                const products = await this.getProducts()
-                const productID = Math.max(...products.map((p) => p.id), 0)
-                product.id = productID + 1
-                products.push(product)
-                await fs.promises.writeFile(this.path, JSON.stringify(products))
-                return 'Product added successfully'
-            } else return 'You need to add all the data if you want save the product'
+            if (!this.#validateData(product)) {
+                return 'You need to add all the data if you want save the product'
+            }
+            const products = await this.getProducts()
+            
+            if (products.some((existingProduct) => existingProduct.code === product.code)) {
+                return 'The product with the same code already exists'
+            }
+            const productID = Math.max(...products.map((p) => p.id), 0)
+            product.id = productID + 1
+            products.push(product)
+            await fs.promises.writeFile(this.path, JSON.stringify(products))
+            return 'Product added successfully'
         } catch (error) {
             console.log(error)
         }
@@ -161,5 +166,5 @@ class ProductManager {
 //     else console.log('JSON file deleted successfully')
 // })
 
-const test = new ProductManager();
-test.testing();
+const test = new ProductManager()
+test.testing()
