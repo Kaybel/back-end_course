@@ -156,7 +156,10 @@ class ProductManager {
     }
 }
 
-//fs.unlink('./products.json')
-  
+// fs.unlink('./products.json', (err) => {
+//     if (err) console.error('Error at JSON file when you try to delete')
+//     else console.log('JSON file deleted successfully')
+// })
+
 const test = new ProductManager();
 test.testing();
