@@ -5,19 +5,19 @@ const fs = require('fs')
 
 class ProductManager {
     constructor () {
-        this.path = '/products.json'
+        this.path = './products.json'
     }
 
     async addProduct(product) {
         try {
             if(this.#validateData(product)){
                 const products = await this.getProducts()
-                const productID = Math.max(...products.map((p) => p.id), 0);
-                product.id = productID + 1;
-                products.push(product)  
+                const productID = Math.max(...products.map((p) => p.id), 0)
+                product.id = productID + 1
+                products.push(product)
                 await fs.promises.writeFile(this.path, JSON.stringify(products))
-                return 'you add succesfully a product'
-            } else return 'you need to add all the data for save the product'
+                return 'Product added successfully'
+            } else return 'You need to add all the data if you want save the product'
         } catch (error) {
             console.log(error)
         }
@@ -46,6 +46,7 @@ class ProductManager {
         ) return true
         return false
     }
+
     async getProductById(id) {
         try {
             const products = await this.getProducts()
@@ -54,24 +55,21 @@ class ProductManager {
             else return 'Product not found'
         } catch (error) {
             console.log(error)
-            return 'error'
         }
     }
-    
+
     async updateProductById(id, product) {
         try {
             const products = await this.getProducts()
-            const productIndex = products.findIndex((product) => product.id === id);
+            const productIndex = products.findIndex((product) => product.id === id)
             if (productIndex !== -1) {
                 // keep the same id
                 product.id = id
                 // change the data
-                products[productIndex] = updatedProduct
+                products[productIndex] = product
                 // overwrite the json with the updated data
-                await fs.promises.writeFile(this.path, JSON.stringify(product))
+                await fs.promises.writeFile(this.path, JSON.stringify(products))
             } else return 'Product not found'
-
-
         } catch (error) {
             console.log(error)
         }
@@ -80,10 +78,10 @@ class ProductManager {
     async deleteProductById(id) {
         try {
             const products = await this.getProducts()
-            const productToDelete = await this.getProductById(id)            
-            if (productToDelete.length > 0) {
+            const productIndex = products.findIndex((product) => product.id === id)
+            if (productIndex !== -1) {
                 // delete the data by the id in the arr
-                products.splice(productToDelete, 1)
+                products.splice(productIndex, 1)
                 // overwrite the json with the deleted data
                 await fs.promises.writeFile(this.path, JSON.stringify(products))
                 return 'Product deleted successfully'
