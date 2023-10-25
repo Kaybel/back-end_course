@@ -7,16 +7,14 @@ const PORT = 8080
 
 app.get('/products', async (req, res) => {
     try {
-        let limit = req.query.limit
+        const limit = parseInt(req.query.limit)
         const products = await productManager.getProducts()
 
-        if (limit === '') return res.json(products)
-        else limit = parseInt(limit)
-
-        if (isNaN(limit)) return res.status(400).json({ error: 'The param << limit >> is not a number' })
-        else if (limit > products.length) return res.json(products)
-        else return res.json(products.slice(0, limit))
-
+        if (!isNaN(limit) && limit > 0) {
+            res.json(products.slice(0, limit))
+        } else {
+            res.json(products)
+        }
     } catch (error) {
         return res.status(500).json({ error: 'Products not found' })
     }
