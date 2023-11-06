@@ -61,10 +61,12 @@ class CartManager {
         try {
             const carts = await this.getCarts()
             const cart = carts.find((cart) => cart.id === id)
-    
+
             if (cart) {
                 const products = []
-    
+                if (!Array.isArray(cart.products)) {
+                    cart.products = [cart.products]
+                }
                 for (const product of cart.products) {
                     const eachProduct = await productManager.getProductById(product.id)
     
@@ -87,6 +89,9 @@ class CartManager {
             const cart = await this.getCartById(cid)
     
             if (cart) {
+                if (!Array.isArray(cart.products)) {
+                    cart.products = [cart.products]
+                }
                 const productIndex = cart.products.findIndex((product) => product.id === pid)
                 
                 if (productIndex !== -1) {

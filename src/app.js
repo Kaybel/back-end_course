@@ -1,6 +1,6 @@
 import express from 'express'
-import productsRouter from './api/products'
-import cartsRouter from './api/carts'
+import productsRouter from './api/products.js'
+import cartsRouter from './api/carts.js'
 
 const app = express()
 const PORT = 8080
