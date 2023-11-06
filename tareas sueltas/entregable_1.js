@@ -5,7 +5,7 @@ class ProductManager {
     }
     addProduct(title, description, price, thumbnail, code, stock) {
         if (this.products.find((product) => product.code === code)) {
-            return 'the code camp already exists';
+            return 'the code camp already exists'
         }
     
         const product = {

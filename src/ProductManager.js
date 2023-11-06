@@ -5,7 +5,21 @@ class ProductManager {
         this.path = './products.json'
     }
 
-    async addProduct(product) {
+    async addProduct(product){
+        try {
+            if (Array.isArray(product)) {
+                const addProducts = await this.addArrProduct(product)
+                return addProducts
+            } else {
+                const addProduct = await this.addOneProduct(product)
+                return addProduct
+            }
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    async addOneProduct(product) {
         try {
             if (!this.#validateData(product)) {
                 return 'You need to add all the data if you want save the product'
@@ -16,10 +30,41 @@ class ProductManager {
                 return 'The product with the same code already exists'
             }
             const productID = Math.max(...products.map((p) => p.id), 0)
+            const quantity = Math.max(...products.map((p) => p.quantity), 0)
             product.id = productID + 1
+            product.quantity = quantity + 1
             products.push(product)
             await fs.promises.writeFile(this.path, JSON.stringify(products))
-            return 'Product added successfully'
+            return product
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    async addArrProduct(product) {
+        try {    
+            const newProducts = []
+    
+            const products = await this.getProducts()
+    
+            for (const item of product) {
+                if (this.#validateData(item)) {
+                    if (!products.some((existingProduct) => existingProduct.code === item.code)) {
+                        const productID = Math.max(...products.map((p) => p.id), 0)
+                        const quantity = Math.max(...products.map((p) => p.quantity), 0)
+                        item.id = productID + 1
+                        item.quantity = quantity + 1
+                        newProducts.push(item)
+                    }
+                }
+            }
+    
+            if (newProducts.length > 0) {
+                await fs.promises.writeFile(this.path, JSON.stringify(products))
+                return newProducts
+            } else {
+                return 'The products were already in the database or had missing data.'
+            }
         } catch (error) {
             console.log(error)
         }
@@ -34,19 +79,6 @@ class ProductManager {
         } catch (error) {
             console.log(error)
         }
-    }
-
-    #validateData(product) {
-        const { title, description, price, thumbnail, code, stock } = product
-        if (
-            title && title.trim() !== '' &&
-            description && description.trim() !== '' &&
-            typeof price === 'number' &&
-            thumbnail && thumbnail.trim() !== '' &&
-            code && code.trim() !== '' &&
-            typeof stock === 'number'
-        ) return true
-        return false
     }
 
     async getProductById(id) {
@@ -65,14 +97,18 @@ class ProductManager {
             const products = await this.getProducts()
             const productIndex = products.findIndex((product) => product.id === id)
             if (productIndex !== -1) {
-                // keep the same id
-                product.id = id
-                // change the data
-                products[productIndex] = product
-                // overwrite the json with the updated data
-                await fs.promises.writeFile(this.path, JSON.stringify(products))
-                return 'Product updated successfully'
-            } else return null
+                if(product.id !== undefined && product.id !== id){
+                    return 'You cannot change the product id'
+                } else {
+                    // keep the same id
+                    product.id = id
+                    // change the data
+                    products[productIndex] = product
+                    // overwrite the json with the updated data
+                    await fs.promises.writeFile(this.path, JSON.stringify(products))
+                    return 'OK'
+                }
+            } else return 'The product you are looking for, not exist'
         } catch (error) {
             console.log(error)
         }
@@ -87,11 +123,27 @@ class ProductManager {
                 products.splice(productIndex, 1)
                 // overwrite the json with the deleted data
                 await fs.promises.writeFile(this.path, JSON.stringify(products))
-                return 'Product deleted successfully'
-            } else return null
+                return 'OK'
+            } else return 'The product you are looking for, not exist'
         } catch (error) {
             console.log(error)
         }
+    }
+    
+    #validateData(product) {
+        const { title, description, price, thumbnail, code, stock, category, quantity } = product
+    
+        if (
+            title && title.trim() !== '' &&
+            description && description.trim() !== '' &&
+            typeof price === 'number' &&
+            (thumbnail === undefined || (Array.isArray(thumbnail) && thumbnail.every(str => typeof str === 'string'))) &&
+            code && code.trim() !== '' &&
+            typeof stock === 'number' &&
+            category && category.trim() !== '' &&
+            typeof quantity === 'number'
+        ) return true
+        return false
     }
 
     async testing() {
@@ -111,7 +163,8 @@ class ProductManager {
             price: 200,
             thumbnail: 'Sin imagen',
             code: 'abc456',
-            stock: 25
+            stock: 25,
+            category: 'some'
         }
 
         const product3 = {
@@ -120,7 +173,8 @@ class ProductManager {
             price: 200,
             thumbnail: 'Sin imagen',
             code: 'abc789',
-            stock: 25
+            stock: 25,
+            category: 'some'
         }
 
         const product4 = {
@@ -129,7 +183,8 @@ class ProductManager {
             price: 200,
             thumbnail: 'Sin imagen',
             code: 'abc852',
-            stock: 25
+            stock: 25,
+            category: 'some'
         }
 
         const product5 = {
@@ -138,7 +193,8 @@ class ProductManager {
             price: 200,
             thumbnail: 'Sin imagen',
             code: 'def123',
-            stock: 25
+            stock: 25,
+            category: 'some'
         }
 
         const product6 = {
@@ -147,7 +203,8 @@ class ProductManager {
             price: 200,
             thumbnail: 'Sin imagen',
             code: 'def456',
-            stock: 25
+            stock: 25,
+            category: 'some'
         }
 
         const product7 = {
@@ -156,7 +213,8 @@ class ProductManager {
             price: 200,
             thumbnail: 'Sin imagen',
             code: 'def789',
-            stock: 25
+            stock: 25,
+            category: 'some'
         }
 
         const product8 = {
@@ -165,7 +223,8 @@ class ProductManager {
             price: 200,
             thumbnail: 'Sin imagen',
             code: 'ghi123',
-            stock: 25
+            stock: 25,
+            category: 'some'
         }
 
         const product9 = {
@@ -174,7 +233,8 @@ class ProductManager {
             price: 200,
             thumbnail: 'Sin imagen',
             code: 'ghi456',
-            stock: 25
+            stock: 25,
+            category: 'some'
         }
 
         const product10 = {
@@ -183,55 +243,11 @@ class ProductManager {
             price: 200,
             thumbnail: 'Sin imagen',
             code: 'ghi789',
-            stock: 25
+            stock: 25,
+            category: 'some'
         }
 
-
-        // Se creará una instancia de la clase “ProductManager”
         const productManager = new ProductManager()
-
-        // Se llamará “getProducts” recién creada la instancia, debe devolver un arreglo vacío []
-        // // console.log(await productManager.getProducts())
-
-        // Se llamará al método “addProduct” con los campos:
-        // title: “producto prueba”
-        // description:”Este es un producto prueba”
-        // price:200,
-        // thumbnail:”Sin imagen”
-        // code:”abc123”,
-        // stock:25
-        // El objeto debe agregarse satisfactoriamente con un id generado automáticamente SIN REPETIRSE
-        // // console.log(await productManager.addProduct(product1))
-        // // console.log(await productManager.addProduct(product2))
-        // // console.log(await productManager.addProduct(product3))
-        // // console.log(await productManager.addProduct(product4))
-        // // console.log(await productManager.addProduct(product5))
-        // // console.log(await productManager.addProduct(product6))
-        // // console.log(await productManager.addProduct(product7))
-        // // console.log(await productManager.addProduct(product8))
-        // // console.log(await productManager.addProduct(product9))
-        // // console.log(await productManager.addProduct(product10))
-
-        //Se llamará el método “getProducts” nuevamente, esta vez debe aparecer el producto recién agregado
-        // //console.log(await productManager.getProducts())
-
-        //Se llamará al método “getProductById” y se corroborará que devuelva el producto con el id especificado, en caso de no existir, debe arrojar un error.
-        // //console.log(await productManager.getProductById(1))
-        // //console.log(await productManager.getProductById(15))
-
-        //Se llamará al método “updateProduct” y se intentará cambiar un campo de algún producto, se evaluará que no se elimine el id y que sí se haya hecho la actualización.
-        // //console.log(await productManager.updateProduct(1, product3))
-        // //console.log(await productManager.getProducts())
-
-        //Se llamará al método “deleteProduct”, se evaluará que realmente se elimine el producto o que arroje un error en caso de no existir.
-        // //console.log(await productManager.deleteProduct(1))
-        // //console.log(await productManager.getProducts())
-
-        //Se llamará al método “addProduct” con los mismos campos de arriba, debe arrojar un error porque el código estará repetido.
-        // //console.log(await productManager.addProduct(product2))
-
-        // Se evaluará que addProduct devuelva error si no encuentra algun parametro (parametro vacio sino node retorna error)
-        // //console.log(await productManager.addProduct(product4))
     }
 
 }
